@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>muffin的项目导航站</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0b0e17;
+    --card: rgba(255,255,255,.045);
+    --card-h: rgba(255,255,255,.09);
+    --line: rgba(255,255,255,.08);
+    --text: #e9edf7;
+    --muted: #8e97ad;
+    --accent: #5b8cff;
+    --shadow: 0 10px 30px rgba(0,0,0,.45);
+  }
+  html[data-theme="light"] {
+    --bg: #f3f5fb;
+    --card: rgba(255,255,255,.9);
+    --card-h: #ffffff;
+    --line: rgba(15,23,42,.09);
+    --text: #111827;
+    --muted: #6b7280;
+    --accent: #2f6bff;
+    --shadow: 0 10px 30px rgba(15,23,42,.09);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    transition: background .3s, color .3s;
+    overflow-x: hidden;
+  }
+
+  /* 背景光斑 */
+  .glow { position: fixed; border-radius: 50%; filter: blur(130px); pointer-events: none; z-index: 0; }
+  .glow-1 { width: 540px; height: 540px; background: #3b5bff; top: -200px; left: -140px; opacity: .32; }
+  .glow-2 { width: 480px; height: 480px; background: #8b3bff; top: 100px; right: -180px; opacity: .2; }
+  html[data-theme="light"] .glow-1 { opacity: .16; }
+  html[data-theme="light"] .glow-2 { opacity: .12; }
+
+  /* ============ 头部 ============ */
+  .hero { max-width: 1180px; margin: 0 auto; padding: 46px 22px 26px; position: relative; z-index: 1; }
+
+  .hero-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 10px; }
+
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .logo {
+    width: 54px; height: 54px; border-radius: 17px; flex: 0 0 auto;
+    display: grid; place-items: center; font-size: 26px;
+    background: linear-gradient(135deg, #5b8cff, #a06cff);
+    box-shadow: 0 8px 26px rgba(91,140,255,.4);
+  }
+  .brand h1 { font-size: 26px; letter-spacing: .5px; }
+  .brand p { color: var(--muted); font-size: 13.5px; margin-top: 6px; }
+
+  .theme-btn {
+    width: 46px; height: 46px; flex: 0 0 auto;
+    border-radius: 14px; border: 1px solid var(--line);
+    background: var(--card); color: var(--text);
+    font-size: 19px; cursor: pointer;
+    transition: transform .25s, background .2s;
+  }
+  .theme-btn:hover { background: var(--card-h); transform: rotate(-18deg); }
+
+  /* ============ 主体 ============ */
+  .main { max-width: 1180px; margin: 0 auto; padding: 20px 22px 60px; position: relative; z-index: 1; }
+
+  .cat-section { margin-bottom: 36px; animation: fadeUp .35s ease both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  .cat-title {
+    font-size: 15px; font-weight: 600; letter-spacing: .5px;
+    margin-bottom: 14px; display: flex; align-items: center; gap: 9px;
+  }
+  .cat-title::before {
+    content: ''; width: 4px; height: 16px; border-radius: 2px;
+    background: linear-gradient(180deg, #5b8cff, #a06cff);
+  }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 13px; }
+
+  .card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px; border-radius: 15px;
+    background: var(--card); border: 1px solid var(--line);
+    text-decoration: none; color: inherit;
+    backdrop-filter: blur(8px);
+    transition: transform .2s, background .2s, border-color .2s, box-shadow .2s;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    background: var(--card-h);
+    border-color: var(--accent);
+    box-shadow: var(--shadow);
+  }
+
+  .ico {
+    width: 42px; height: 42px; flex: 0 0 42px;
+    border-radius: 12px; position: relative; overflow: hidden;
+    display: grid; place-items: center;
+    font-size: 18px; font-weight: 700; color: #fff;
+  }
+  .ico img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%; object-fit: contain;
+    padding: 7px; background: #fff; border-radius: 12px;
+  }
+
+  .info { min-width: 0; flex: 1; }
+  .name { font-size: 14.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .desc { font-size: 12px; color: var(--muted); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* 页脚 */
+  .footer {
+    max-width: 1180px; margin: 0 auto; padding: 0 22px 55px;
+    text-align: center; color: var(--muted); font-size: 13px;
+    position: relative; z-index: 1;
+  }
+
+  /* ============ 响应式 ============ */
+  @media (max-width: 640px) {
+    .hero { padding: 28px 16px 18px; }
+    .brand h1 { font-size: 20px; }
+    .brand p { font-size: 12px; }
+    .logo { width: 44px; height: 44px; font-size: 22px; border-radius: 13px; }
+    .theme-btn { width: 42px; height: 42px; font-size: 17px; }
+    .main { padding: 16px 16px 45px; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 10px; }
+    .card { padding: 14px; gap: 12px; }
+    .ico { width: 42px; height: 42px; flex-basis: 42px; font-size: 16px; }
+    .name { font-size: 15px; }
+    .desc { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+
+<header class="hero">
+  <div class="hero-row">
+    <div class="brand">
+      <div class="logo">🧭</div>
+      <div>
+        <h1>muffin的项目导航站</h1>
+        <p>个人项目集合</p>
+      </div>
+    </div>
+    <button class="theme-btn" id="themeBtn" aria-label="切换主题">🌙</button>
+  </div>
+</header>
+
+<main class="main" id="main"></main>
+
+<footer class="footer">
+  <p>共收录 2 个站点 · 本站仅为个人链接集合</p>
+</footer>
+
+<script>
+/* ==================== 数据区 ==================== */
+const DATA = {
+  '我的项目': [
+    ['Minecraft Database', 'pleass545.github.io/Minecraft-Database/', 'Minecraft 数据库与资料站'],
+    ['迷你世界muffin怀旧服', 'pleass545.github.io/mini-world-muffin/', '迷你世界 0.52.1 怀旧服与开发记录']
+  ]
+};
+
+/* ==================== 图标配色 ==================== */
+const PALETTES = [
+  ['#ff6b6b', '#ee5a6f'], ['#4facfe', '#00c6fb'], ['#43e97b', '#26c281'],
+  ['#fa709a', '#f76b8a'], ['#7c5cff', '#5b8cff'], ['#f7971e', '#ffb347'],
+  ['#00c9a7', '#00b8a9'], ['#a06cff', '#7b61ff'], ['#3a7bd5', '#2b6cb0'],
+  ['#12c2e9', '#0fb9d4'], ['#e0a90f', '#d4a017'], ['#f6707a', '#e8556d'],
+];
+
+/* ==================== 工具函数 ==================== */
+const esc = s => String(s).replace(/[&<>"']/g,
+  m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+
+function hash(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+/* ==================== DOM ==================== */
+const mainEl = document.getElementById('main');
+const themeBtn = document.getElementById('themeBtn');
+
+/* --- 生成卡片 --- */
+function makeCard(item) {
+  const [name, domain, desc] = item;
+  const [c1, c2] = PALETTES[hash(name) % PALETTES.length];
+  const letter = name.trim().charAt(0).toUpperCase();
+  // 提取纯域名用于抓取图标
+  const pureDomain = domain.split('/')[0];
+
+  const a = document.createElement('a');
+  a.className = 'card';
+  a.href = 'https://' + domain;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  a.title = name + ' — ' + desc;
+
+  a.innerHTML =
+    '<div class="ico" style="background:linear-gradient(135deg,' + c1 + ',' + c2 + ')">' +
+      '<span>' + esc(letter) + '</span>' +
+      '<img src="https://favicon.im/' + pureDomain + '?larger=true" alt="" loading="lazy" ' +
+           'referrerpolicy="no-referrer" onerror="this.remove()">' +
+    '</div>' +
+    '<div class="info">' +
+      '<div class="name">' + esc(name) + '</div>' +
+      '<div class="desc">' + esc(desc) + '</div>' +
+    '</div>';
+
+  return a;
+}
+
+/* --- 渲染 --- */
+function render() {
+  const frag = document.createDocumentFragment();
+
+  for (const cat in DATA) {
+    const items = DATA[cat];
+    if (!items.length) continue;
+
+    const sec = document.createElement('section');
+    sec.className = 'cat-section';
+
+    const h2 = document.createElement('h2');
+    h2.className = 'cat-title';
+    h2.innerHTML = esc(cat);
+    sec.appendChild(h2);
+
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    items.forEach(it => grid.appendChild(makeCard(it)));
+    sec.appendChild(grid);
+
+    frag.appendChild(sec);
+  }
+
+  mainEl.innerHTML = '';
+  mainEl.appendChild(frag);
+}
+
+/* --- 主题切换 --- */
+(function initTheme() {
+  const saved = localStorage.getItem('nav-theme') || 'dark';
+  document.documentElement.dataset.theme = saved;
+  themeBtn.textContent = saved === 'dark' ? '🌙' : '☀️';
+})();
+
+themeBtn.addEventListener('click', () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  themeBtn.textContent = next === 'dark' ? '🌙' : '☀️';
+  try { localStorage.setItem('nav-theme', next); } catch (e) {}
+});
+
+/* --- 首屏渲染 --- */
+render();
+</script>
+</body>
+</html>
